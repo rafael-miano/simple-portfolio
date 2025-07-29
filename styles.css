@@ -120,7 +120,6 @@ body {
     color: #9296b6;
 }
 
-/* Navbar glass effect */
 .glass {
     background: rgba(13, 18, 36, 0.79);
     -webkit-backdrop-filter: blur(8px);
@@ -128,34 +127,15 @@ body {
     border-bottom: 1px solid #23233a;
 }
 
-/* Hide scroll bar for Marquee */
 .marquee-container::-webkit-scrollbar {
     display: none;
 }
 
-/* Remove extra padding for minimalism */
 .section-pad {
     padding-top: 2.3rem;
     padding-bottom: 1.6rem;
 }
 
-/* Remove default margin on first section */
-@media (max-width: 640px) {
-    .section-pad {
-        padding-top: 1.3rem;
-        padding-bottom: 1.05rem;
-    }
-
-    .card-min {
-        font-size: .81rem;
-    }
-
-    .section-title {
-        font-size: .95rem;
-    }
-}
-
-/* AOS Custom Animations */
 [data-aos="fade-up"] {
     opacity: 0;
     transform: translateY(20px);
@@ -297,14 +277,34 @@ body {
     letter-spacing: 0.01em;
     pointer-events: none;
     user-select: none;
-    white-space: nowrap;
-    min-width: 96px;
-    min-height: 96px;
+    width: 120px;
+    height: 120px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
     box-shadow: 0 4px 20px 0 #21223a15;
 }
+
+.center-label-minimal span {
+    font-size: 0.83rem;
+    color: #a78bfa;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 110px;
+    white-space: nowrap;
+    display: block;
+}
+
+.center-label-minimal img {
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
 .navbar-active {
     color: #a78bfa !important;
     font-weight: 700;
@@ -312,22 +312,124 @@ body {
     transition: color .2s, border-bottom .2s, background .2s;
 }
 
+.skills-circle-wrapper {
+    height: 600px;
+}
+
 @media (max-width: 640px) {
+    .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #181a2f;
+    }
+
+    .section-pad {
+        padding-top: 1.3rem;
+        padding-bottom: 1.05rem;
+    }
+
+    .card-min {
+        font-size: .81rem;
+    }
+
+    .section-title {
+        font-size: .95rem;
+    }
+
+    .skills-circle-wrapper {
+        height: 68vw;
+        min-height: 210px;
+        max-height: 650px;
+    }
+
     .circle-container {
-        width: 98vw;
-        height: 98vw;
+        width: 90vw;
+        height: 90vw;
         min-width: 210px;
         min-height: 210px;
         max-width: 650px;
         max-height: 650px;
     }
+
     .itemDot {
-        width: 40px;
-        height: 40px;
-        font-size: 9px;
+        width: 36px;
+        height: 36px;
+        font-size: 8px;
+        border-radius: 12px;
+        padding: 0;
     }
+
     .itemDot img {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
+        margin-bottom: 1px;
+    }
+
+    .itemDot span {
+        font-size: 0.57rem;
+    }
+
+    .center-label-minimal {
+        min-width: 52px;
+        min-height: 52px;
+        font-size: 0.81rem;
+    }
+
+    .marquee {
+        flex-wrap: wrap;
+        width: 100% !important;
+        gap: 0.4rem;
+        animation: none !important;
+        justify-content: center;
+    }
+
+    .skill-card {
+        width: 2.7rem;
+        min-width: 2.7rem;
+        padding: .38rem 0 .15rem 0;
+    }
+
+    .skill-card img {
+        height: 1.1rem;
+        width: 1.1rem;
+        margin-bottom: .2rem;
+    }
+
+    .skill-card p {
+        font-size: .59rem;
+    }
+
+    .center-label-minimal {
+        width: 50px;
+        height: 50px;
+        min-width: 50px;
+        min-height: 50px;
+        max-width: 50px;
+        max-height: 50px;
+        border-radius: 50%;
+        background: #181a2f;
+        border: 1.5px solid #23233a;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 20px 0 #21223a15;
+        overflow: hidden;
+        text-align: center;
+        padding: 0;
+        white-space: normal;
+    }
+
+    .center-label-minimal img {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 6px;
+        object-fit: cover;
+    }
+
+    .center-label-minimal span {
+        font-size: 0.75rem;
+        max-width: 88px;
     }
 }
