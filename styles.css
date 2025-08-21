@@ -320,8 +320,15 @@ body {
     .navbar {
         position: sticky;
         top: 0;
-        z-index: 100;
+        z-index: 1000;
         background: #181a2f;
+        /* your color */
+        display: flex;
+        justify-content: center;
+        /* centers children horizontally */
+        align-items: center;
+        /* centers children vertically (optional) */
+        width: 100%;
     }
 
     .section-pad {
@@ -414,10 +421,10 @@ body {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        overflow: hidden;    
+        overflow: hidden;
         text-align: center;
         padding: 0;
-        position: absolute;   
+        position: absolute;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
