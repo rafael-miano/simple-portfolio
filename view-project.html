@@ -151,23 +151,33 @@
             .meta { font-size: 13px; }
             .desc { font-size: 14px; }
             .actions { gap: 8px; }
-            .slider-wrapper { height: clamp(200px, 62vw, 380px); }
+            .hero { padding: 12px; }
+            .slider-wrapper { height: clamp(160px, 48vw, 300px); border-radius: 10px; }
             .slider-dots {
-                gap: 6px;
+                gap: 4px;
                 overflow-x: auto;
                 justify-content: flex-start;
-                padding: 4px 2px;
+                padding: 2px 0;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
             }
             .slider-dots::-webkit-scrollbar { display: none; }
             .slider-dot {
-                width: 14px;
-                height: 14px;
-                padding: 8px; /* increase touch target */
+                width: 10px;
+                height: 10px;
+                padding: 4px; /* compact but still tappable */
                 flex: 0 0 auto;
             }
-            .hero img { max-height: 380px; }
+            .hero img { max-height: 300px; border-radius: 10px; }
+        }
+
+        /* Extra-small phones */
+        @media (max-width: 380px) {
+            h1 { font-size: 20px; }
+            .meta { font-size: 12px; }
+            .desc { font-size: 13px; }
+            .slider-wrapper { height: clamp(140px, 44vw, 260px); }
+            .slider-dot { width: 9px; height: 9px; padding: 3px; }
         }
         
         .slider-container {
