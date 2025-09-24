@@ -139,7 +139,35 @@
         .btn.secondary { background: rgba(255,255,255,0.03); }
         .footer { color: var(--muted); font-size: 12px; padding: 12px 20px 18px; border-top: none; text-align: center; }
         @media (max-width: 900px) {
-            .hero { grid-template-columns: 1fr; }
+            .container { padding: 20px; }
+            .hero { grid-template-columns: 1fr; gap: 16px; }
+            .slider-wrapper { height: clamp(240px, 56vw, 420px); }
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 16px; }
+            .topbar { margin-bottom: 16px; }
+            h1 { font-size: 22px; }
+            .meta { font-size: 13px; }
+            .desc { font-size: 14px; }
+            .actions { gap: 8px; }
+            .slider-wrapper { height: clamp(200px, 62vw, 380px); }
+            .slider-dots {
+                gap: 6px;
+                overflow-x: auto;
+                justify-content: flex-start;
+                padding: 4px 2px;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .slider-dots::-webkit-scrollbar { display: none; }
+            .slider-dot {
+                width: 14px;
+                height: 14px;
+                padding: 8px; /* increase touch target */
+                flex: 0 0 auto;
+            }
+            .hero img { max-height: 380px; }
         }
         
         .slider-container {
@@ -150,7 +178,7 @@
         .slider-wrapper {
             position: relative;
             width: 100%;
-            height: 420px;
+            height: clamp(260px, 45vw, 420px);
             overflow: hidden;
             border-radius: 12px;
             border: 1px solid var(--border);
@@ -459,17 +487,28 @@
         function initSlider() {
             const slider = document.getElementById("image-slider");
             const dots = document.querySelectorAll(".slider-dot");
+            const wrapper = slider.parentElement; // .slider-wrapper
 
             const sequenceLength = dots.length;
             const domSlides = slider.children.length;
 
             let currentIndex = 0; // 0 .. domSlides-1
+            let autoTimer = null;
+            let isDragging = false;
+            let dragStartX = 0;
+            let dragCurrentX = 0;
+            let dragDeltaX = 0;
 
             function updateDots() {
                 const logicalIndex = ((currentIndex % sequenceLength) + sequenceLength) % sequenceLength;
                 dots.forEach((dot, index) => {
                     dot.classList.toggle("active", index === logicalIndex);
                 });
+                // Ensure active dot remains visible on small screens
+                const activeDot = dots[logicalIndex];
+                if (activeDot && activeDot.scrollIntoView) {
+                    activeDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
             }
 
             function setTransform(index, instant) {
@@ -505,13 +544,72 @@
                 goTo(currentIndex - 1);
             }
 
+            function clearAuto() {
+                if (autoTimer) {
+                    clearInterval(autoTimer);
+                    autoTimer = null;
+                }
+            }
+
+            function startAuto() {
+                clearAuto();
+                autoTimer = setInterval(nextSlide, 5000);
+            }
+
+            // Touch/drag support
+            function onDragStart(clientX) {
+                isDragging = true;
+                dragStartX = clientX;
+                dragCurrentX = clientX;
+                dragDeltaX = 0;
+                slider.style.transition = 'none';
+                clearAuto();
+            }
+
+            function onDragMove(clientX) {
+                if (!isDragging) return;
+                dragCurrentX = clientX;
+                dragDeltaX = dragCurrentX - dragStartX;
+                const width = wrapper.clientWidth || 1;
+                const percent = (dragDeltaX / width) * 100;
+                slider.style.transform = `translateX(calc(-${currentIndex * 100}% + ${percent}%))`;
+            }
+
+            function onDragEnd() {
+                if (!isDragging) return;
+                isDragging = false;
+                const width = wrapper.clientWidth || 1;
+                const threshold = width * 0.15; // 15% swipe
+                if (Math.abs(dragDeltaX) > threshold) {
+                    if (dragDeltaX < 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                } else {
+                    // snap back
+                    setTransform(currentIndex, false);
+                }
+                startAuto();
+            }
+
             dots.forEach((dot, index) => {
                 dot.addEventListener("click", () => {
                     goTo(index);
                 });
             });
 
-            setInterval(nextSlide, 5000);
+            // Pointer/mouse events (desktop)
+            wrapper.addEventListener('mousedown', (e) => onDragStart(e.clientX));
+            window.addEventListener('mousemove', (e) => onDragMove(e.clientX));
+            window.addEventListener('mouseup', onDragEnd);
+
+            // Touch events (mobile)
+            wrapper.addEventListener('touchstart', (e) => onDragStart(e.touches[0].clientX), { passive: true });
+            window.addEventListener('touchmove', (e) => onDragMove(e.touches[0].clientX), { passive: true });
+            window.addEventListener('touchend', onDragEnd);
+
+            startAuto();
 
             goTo(0, { instant: true });
         }
