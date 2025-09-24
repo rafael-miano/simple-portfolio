@@ -28,7 +28,8 @@
 
     <style>
         :root {
-            --bg: #0b0f17;
+            /* Match index.html dark theme (approx. Tailwind neutral-900) */
+            --bg: #171717;
             --card: #121826;
             --text: #e6edf3;
             --muted: #9aa4b2;
@@ -38,6 +39,7 @@
             --shadow: 0 8px 30px rgba(0,0,0,0.35);
         }
         .light {
+            /* Match index.html light background */
             --bg: #f1f5f9;
             --card: #ffffff;
             --text: #0f172a;
@@ -47,6 +49,8 @@
             --border: rgba(15, 23, 42, 0.10);
             --shadow: 0 8px 24px rgba(2, 6, 23, 0.08);
         }
+        /* Keep exact light background parity with index.html */
+        .light body { background-color: #f1f5f9; }
         * { box-sizing: border-box; }
         html, body { height: 100%; }
         body {
@@ -68,6 +72,9 @@
         .vp-shape { filter: blur(0.4px); }
         .vp-stroke { stroke: rgba(255,255,255,0.12); fill: none; }
         .vp-dot { fill: rgba(255,255,255,0.09); }
+        .light .vp-dot { fill: rgba(15,23,42,0.08); }
+        .light .vp-blob-1 { fill: rgba(99,102,241,0.10); }
+        .light .vp-blob-2 { fill: rgba(14,165,233,0.10); }
         .vp-blob-1 { fill: rgba(99,102,241,0.14); }
         .vp-blob-2 { fill: rgba(14,165,233,0.14); }
         @media (prefers-reduced-motion: reduce) { .vp-layer { transform: none !important; } }
@@ -474,7 +481,6 @@
                         "assets/project-ss/corescore/15.png",
                         "assets/project-ss/corescore/16.png"
                     ];
-                    // Preload the first few images for the fastest first paint
                     const head = document.head || document.getElementsByTagName('head')[0];
                     corescoreImages.slice(0, 3).forEach((href) => {
                         const link = document.createElement('link');
@@ -511,7 +517,6 @@
                         if (index === 0) dot.classList.add("active");
                         dotsEl.appendChild(dot);
                     });
-                    // Append a single clone of the first slide to enable seamless looping
                     const firstSlideClone = sliderEl.firstElementChild?.cloneNode(true);
                     if (firstSlideClone) {
                         firstSlideClone.setAttribute('aria-hidden', 'true');
@@ -550,7 +555,7 @@
             const sequenceLength = dots.length;
             const domSlides = slider.children.length;
 
-            let currentIndex = 0; // 0 .. domSlides-1
+            let currentIndex = 0;
             let autoTimer = null;
             let isDragging = false;
             let dragStartX = 0;
@@ -562,7 +567,6 @@
                 dots.forEach((dot, index) => {
                     dot.classList.toggle("active", index === logicalIndex);
                 });
-                // Ensure active dot remains visible on small screens
                 const activeDot = dots[logicalIndex];
                 if (activeDot && activeDot.scrollIntoView) {
                     activeDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
@@ -637,7 +641,7 @@
                 if (!isDragging) return;
                 isDragging = false;
                 const width = wrapper.clientWidth || 1;
-                const threshold = width * 0.15; // 15% swipe
+                const threshold = width * 0.15;
                 if (Math.abs(dragDeltaX) > threshold) {
                     if (dragDeltaX < 0) {
                         nextSlide();
