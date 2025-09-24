@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Project - Rafael Miano</title>
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+
+    <script>
+        const html = document.querySelector("html");
+        const isLightOrAuto =
+          localStorage.getItem("hs_theme") === "light" ||
+          (localStorage.getItem("hs_theme") === "auto" && !window.matchMedia("(prefers-color-scheme: dark)").matches);
+        const isDarkOrAuto =
+          localStorage.getItem("hs_theme") === "dark" ||
+          (localStorage.getItem("hs_theme") === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+        if (isLightOrAuto && html.classList.contains("dark")) html.classList.remove("dark");
+        else if (isDarkOrAuto && html.classList.contains("light")) html.classList.remove("light");
+        else if (isDarkOrAuto && !html.classList.contains("dark")) html.classList.add("dark");
+        else if (isLightOrAuto && !html.classList.contains("light")) html.classList.add("light");
+    </script>
+
+    <style>
+        :root {
+            --bg: #0b0f17;
+            --card: #121826;
+            --text: #e6edf3;
+            --muted: #9aa4b2;
+            --primary: #5aa9e6;
+            --primary-hover: #4796d4;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow: 0 8px 30px rgba(0,0,0,0.35);
+        }
+        .light {
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted: #475569;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --border: rgba(15, 23, 42, 0.10);
+            --shadow: 0 8px 24px rgba(2, 6, 23, 0.08);
+        }
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .vp-parallax {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+            background: transparent;
+        }
+        .vp-layer { position: absolute; inset: 0; will-change: transform; }
+        .vp-shape { filter: blur(0.4px); }
+        .vp-stroke { stroke: rgba(255,255,255,0.12); fill: none; }
+        .vp-dot { fill: rgba(255,255,255,0.09); }
+        .vp-blob-1 { fill: rgba(99,102,241,0.14); }
+        .vp-blob-2 { fill: rgba(14,165,233,0.14); }
+        @media (prefers-reduced-motion: reduce) { .vp-layer { transform: none !important; } }
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--muted);
+            text-decoration: none;
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.02);
+            transition: all .2s ease;
+        }
+        .back:hover { color: var(--text); transform: translateY(-1px); border-color: rgba(255,255,255,0.16); }
+        .card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .hero {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 24px;
+            padding: 20px;
+        }
+        .hero img {
+            width: 100%;
+            height: 100%;
+            max-height: 420px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #0a0f18;
+        }
+        h1 { margin: 0 0 8px 0; font-size: 28px; letter-spacing: 0.2px; }
+        .meta { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+        body, h1, .btn { color: var(--text); }
+        .desc { color: var(--muted); }
+        .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--border);
+            color: var(--text);
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: rgba(90,169,230,0.09);
+            transition: background .2s ease, transform .2s ease, border-color .2s ease;
+        }
+        .btn:hover { background: rgba(90,169,230,0.16); transform: translateY(-1px); border-color: rgba(255,255,255,0.16); }
+        .btn.secondary { background: rgba(255,255,255,0.03); }
+        .footer { color: var(--muted); font-size: 12px; padding: 12px 20px 18px; border-top: none; text-align: center; }
+        @media (max-width: 900px) {
+            .hero { grid-template-columns: 1fr; }
+        }
+        
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: auto;
+        }
+        .slider-wrapper {
+            position: relative;
+            width: 100%;
+            height: 420px;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #0a0f18;
+        }
+        .slider {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease-in-out;
+        }
+        .slider img {
+            min-width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 2;
+        }
+        .slider-btn:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .slider-btn.prev {
+            left: 10px;
+        }
+        .slider-btn.next {
+            right: 10px;
+        }
+        .slider-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .slider-container .footer { margin-top: 10px; }
+        .slider-dot {
+            width: 10px;
+            height: 10px;
+            padding: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-sizing: content-box;
+        }
+        .slider-dot.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: scale(1.2);
+        }
+        .slider-dot:hover {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(255, 255, 255, 0.55);
+        }
+        .light .slider-dot {
+            background: rgba(15, 23, 42, 0.25);
+            border-color: rgba(15, 23, 42, 0.25);
+        }
+        .light .slider-dot.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+        }
+        .light .slider-dot:hover {
+            background: rgba(15, 23, 42, 0.55);
+            border-color: rgba(15, 23, 42, 0.55);
+        }
+        
+        /* GitHub Link Styles */
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .github-link:hover {
+            color: var(--text);
+        }
+        .github-link svg {
+            transition: transform 0.2s ease;
+        }
+        .github-link:hover svg {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="vp-parallax" aria-hidden="true">
+        <div class="vp-layer" data-depth="0.06">
+            <svg class="vp-shape" width="1500" height="950" viewBox="0 0 1500 950" style="position:absolute;left:-8%;top:-10%">
+                <g>
+                    <circle class="vp-dot" cx="180" cy="180" r="3" />
+                    <circle class="vp-dot" cx="1260" cy="760" r="2.5" />
+                    <circle class="vp-dot" cx="1080" cy="260" r="2.5" />
+                </g>
+                <g>
+                    <path class="vp-stroke" d="M100 260 C 320 120, 520 120, 720 260 S 1120 400, 1320 260" stroke-width="1.25"/>
+                    <path class="vp-stroke" d="M140 720 C 360 580, 560 580, 760 720 S 1160 860, 1360 720" stroke-width="1"/>
+                </g>
+            </svg>
+        </div>
+        <div class="vp-layer" data-depth="0.14">
+            <svg class="vp-shape" width="1500" height="950" viewBox="0 0 1500 950" style="position:absolute;left:0;top:0">
+                <g opacity="0.85">
+                    <polygon class="vp-blob-1" points="220,160 340,130 420,240 300,300" />
+                    <polygon class="vp-blob-2" points="980,160 1120,220 1060,320 920,280" />
+                    <polygon class="vp-blob-1" points="360,760 470,740 520,830 390,860" />
+                </g>
+            </svg>
+        </div>
+        <div class="vp-layer" data-depth="0.24">
+            <svg class="vp-shape" width="1500" height="950" viewBox="0 0 1500 950" style="position:absolute;left:-5%;top:-5%">
+                <g opacity="0.7">
+                    <path class="vp-blob-2" d="M1160,220 C1200,140 1320,140 1360,220 C1400,300 1320,360 1260,320 C1200,280 1120,300 1160,220 Z" />
+                    <path class="vp-blob-1" d="M240,640 C280,560 400,560 440,640 C480,720 400,780 340,740 C280,700 200,720 240,640 Z" />
+                </g>
+            </svg>
+        </div>
+    </div>
+    <div class="container">
+        <div class="topbar">
+            <a class="back" href="index.html" aria-label="Back to home">
+                <span>←</span>
+                <span>Back</span>
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="hero">
+                <div class="slider-container">
+                    <div class="slider-wrapper">
+                        <div class="slider" id="image-slider">
+                        </div>
+                        
+                    </div>
+                    <div class="slider-dots" id="slider-dots">
+                    </div>
+                    <div class="footer">
+                        <a href="https://github.com/rafael-miano/bisu-corescore" target="_blank" rel="noopener" class="github-link">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                            <span>View on GitHub</span>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h1 id="project-title">Project Title</h1>
+                    <div class="meta" id="project-tags"></div>
+                    <p class="desc" id="project-description">A short description of the project will appear here.</p>
+                    <div class="actions">
+                        <a id="project-demo-link" class="btn" href="#" target="_blank" rel="noopener" style="display:none;">Live Demo</a>
+                        <a id="project-repo-link" class="btn secondary" href="#" target="_blank" rel="noopener" style="display:none;">Source Code</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function parallax() {
+            const root = document.querySelector('.vp-parallax');
+            if (!root) return;
+            const layers = Array.from(root.querySelectorAll('.vp-layer'));
+            let winW = window.innerWidth, winH = window.innerHeight;
+            const apply = (mouseX = 0, mouseY = 0) => {
+                const scrollY = window.scrollY || window.pageYOffset;
+                for (const layer of layers) {
+                    const depth = parseFloat(layer.getAttribute('data-depth') || '0');
+                    const tx = mouseX * depth * 18;
+                    const ty = mouseY * depth * 18;
+                    layer.style.transform = `translate3d(${tx}px, ${-scrollY * depth + ty}px, 0)`;
+                }
+            };
+            const onScroll = () => apply();
+            const onMouse = (e) => apply((e.clientX / winW - 0.5), (e.clientY / winH - 0.5));
+            const onResize = () => { winW = window.innerWidth; winH = window.innerHeight; apply(); };
+            window.addEventListener('scroll', onScroll, { passive: true });
+            window.addEventListener('mousemove', onMouse, { passive: true });
+            window.addEventListener('resize', onResize);
+            apply();
+        })();
+
+        (function populateFromQuery() {
+            const params = new URLSearchParams(window.location.search);
+            const get = (k) => params.get(k) || "";
+
+            const title = get("title") || "Project Title";
+            const description = get("description") || "A short description of the project will appear here.";
+            const image = get("image");
+            const demo = get("demo");
+            const repo = get("repo");
+            const tags = get("tags");
+
+            document.getElementById("project-title").textContent = title;
+            document.getElementById("project-description").textContent = description;
+
+            const tagsEl = document.getElementById("project-tags");
+            if (tags) {
+                const list = tags.split(",").map((t) => t.trim()).filter(Boolean);
+                tagsEl.textContent = list.join(" • ");
+            } else {
+                tagsEl.style.display = "none";
+            }
+
+            const sliderEl = document.getElementById("image-slider");
+            const dotsEl = document.getElementById("slider-dots");
+            
+            if (image) {
+                if (image.includes("corescore")) {
+                    const corescoreImages = [
+                        "assets/project-ss/corescore/1.png",
+                        "assets/project-ss/corescore/2.png", 
+                        "assets/project-ss/corescore/3.png",
+                        "assets/project-ss/corescore/4.png",
+                        "assets/project-ss/corescore/5.png",
+                        "assets/project-ss/corescore/6.png",
+                        "assets/project-ss/corescore/7.png",
+                        "assets/project-ss/corescore/8.png",
+                        "assets/project-ss/corescore/8-1.png",
+                        "assets/project-ss/corescore/9.png",
+                        "assets/project-ss/corescore/9-1.png",
+                        "assets/project-ss/corescore/10.png",
+                        "assets/project-ss/corescore/10-1.png",
+                        "assets/project-ss/corescore/11.png",
+                        "assets/project-ss/corescore/12.png",
+                        "assets/project-ss/corescore/13.png",
+                        "assets/project-ss/corescore/14.png",
+                        "assets/project-ss/corescore/15.png",
+                        "assets/project-ss/corescore/16.png"
+                    ];
+                    
+                    corescoreImages.forEach((imgSrc, index) => {
+                        const img = document.createElement("img");
+                        img.src = imgSrc;
+                        img.alt = `CoreScore Screenshot ${index + 1}`;
+                        img.loading = "lazy";
+                        img.onerror = function() {
+                            console.error(`Failed to load image: ${imgSrc}`);
+                        };
+                        img.onload = function() {
+                            console.log(`Loaded image: ${imgSrc}`);
+                        };
+                        sliderEl.appendChild(img);
+                        
+                        const dot = document.createElement("button");
+                        dot.className = "slider-dot";
+                        dot.setAttribute("data-slide", index);
+                        if (index === 0) dot.classList.add("active");
+                        dotsEl.appendChild(dot);
+                    });
+                    
+                    corescoreImages.forEach((imgSrc, index) => {
+                        const img = document.createElement("img");
+                        img.src = imgSrc;
+                        img.alt = `CoreScore Screenshot ${index + 1} (duplicate)`;
+                        img.loading = "lazy";
+                        sliderEl.appendChild(img);
+                    });
+                    setTimeout(() => {
+                        initSlider();
+                    }, 100);
+                } else {
+                    const img = document.createElement("img");
+                    img.src = image;
+                    img.alt = title;
+                    img.loading = "lazy";
+                    sliderEl.appendChild(img);
+                }
+            }
+
+            const demoEl = document.getElementById("project-demo-link");
+            if (demo) {
+                demoEl.href = demo;
+                demoEl.style.display = "inline-flex";
+            }
+
+            const repoEl = document.getElementById("project-repo-link");
+            if (repo) {
+                repoEl.href = repo;
+                repoEl.style.display = "inline-flex";
+            }
+        })();
+
+        function initSlider() {
+            const slider = document.getElementById("image-slider");
+            const dots = document.querySelectorAll(".slider-dot");
+
+            const sequenceLength = dots.length;
+            const domSlides = slider.children.length;
+
+            let currentIndex = 0; // 0 .. domSlides-1
+
+            function updateDots() {
+                const logicalIndex = ((currentIndex % sequenceLength) + sequenceLength) % sequenceLength;
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle("active", index === logicalIndex);
+                });
+            }
+
+            function setTransform(index, instant) {
+                slider.style.transition = instant ? "none" : "transform 0.3s ease-in-out";
+                slider.style.transform = `translateX(-${index * 100}%)`;
+            }
+
+            function goTo(index, { instant = false } = {}) {
+                currentIndex = index;
+                setTransform(currentIndex, instant);
+                updateDots();
+            }
+
+            function nextSlide() {
+                if (currentIndex === domSlides - 1) {
+                    goTo(0, { instant: true });
+                    requestAnimationFrame(() => requestAnimationFrame(() => goTo(1)));
+                    return;
+                }
+                goTo(currentIndex + 1);
+
+                if (currentIndex === sequenceLength) {
+                    setTimeout(() => {
+                        goTo(0, { instant: true });
+                    }, 310);
+                }
+            }
+
+            function prevSlide() {
+                if (currentIndex === 0) {
+                    goTo(sequenceLength, { instant: true });
+                }
+                goTo(currentIndex - 1);
+            }
+
+            dots.forEach((dot, index) => {
+                dot.addEventListener("click", () => {
+                    goTo(index);
+                });
+            });
+
+            setInterval(nextSlide, 5000);
+
+            goTo(0, { instant: true });
+        }
+    </script>
+</body>
+</html>
+
+
