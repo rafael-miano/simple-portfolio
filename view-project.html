@@ -144,6 +144,12 @@
             .slider-wrapper { height: clamp(240px, 56vw, 420px); }
         }
 
+        /* Tablets and large phones */
+        @media (max-width: 768px) {
+            .hero { padding: 14px; }
+            .slider-wrapper { height: clamp(170px, 50vw, 340px); }
+        }
+
         @media (max-width: 600px) {
             .container { padding: 16px; }
             .topbar { margin-bottom: 16px; }
@@ -152,8 +158,9 @@
             .desc { font-size: 14px; }
             .actions { gap: 8px; }
             .hero { padding: 12px; }
-            .slider-wrapper { height: clamp(160px, 48vw, 300px); border-radius: 10px; }
+            .slider-wrapper { height: clamp(150px, 44vw, 280px); border-radius: 10px; }
             .slider-dots {
+                display: none;
                 gap: 4px;
                 overflow-x: auto;
                 justify-content: flex-start;
@@ -163,21 +170,30 @@
             }
             .slider-dots::-webkit-scrollbar { display: none; }
             .slider-dot {
-                width: 10px;
-                height: 10px;
+                width: 9px;
+                height: 9px;
                 padding: 4px; /* compact but still tappable */
                 flex: 0 0 auto;
             }
             .hero img { max-height: 300px; border-radius: 10px; }
         }
 
-        /* Extra-small phones */
-        @media (max-width: 380px) {
+        /* Mid-size phones */
+        @media (max-width: 430px) {
             h1 { font-size: 20px; }
             .meta { font-size: 12px; }
             .desc { font-size: 13px; }
-            .slider-wrapper { height: clamp(140px, 44vw, 260px); }
-            .slider-dot { width: 9px; height: 9px; padding: 3px; }
+            .slider-wrapper { height: clamp(135px, 42vw, 240px); }
+            .slider-dot { width: 8px; height: 8px; padding: 3px; }
+        }
+
+        /* Extra-small phones */
+        @media (max-width: 380px) {
+            h1 { font-size: 19px; }
+            .meta { font-size: 12px; }
+            .desc { font-size: 12.5px; }
+            .slider-wrapper { height: clamp(125px, 40vw, 220px); }
+            .slider-dot { width: 7.5px; height: 7.5px; padding: 3px; }
         }
         
         .slider-container {
@@ -276,6 +292,11 @@
             border-color: rgba(15, 23, 42, 0.55);
         }
         
+        /* Ensure dots are hidden on small screens (override cascade) */
+        @media (max-width: 600px) {
+            .slider-dots { display: none !important; }
+        }
+        
         /* GitHub Link Styles */
         .github-link {
             display: inline-flex;
@@ -293,6 +314,18 @@
         }
         .github-link:hover svg {
             transform: scale(1.1);
+        }
+
+        /* Swipe hint (hidden by default, shown on mobile) */
+        .swipe-hint {
+            display: none;
+            color: var(--muted);
+            font-size: 12px;
+            text-align: center;
+            margin: 8px 0 6px;
+        }
+        @media (max-width: 600px) {
+            .swipe-hint { display: block; }
         }
     </style>
 </head>
@@ -347,6 +380,7 @@
                     </div>
                     <div class="slider-dots" id="slider-dots">
                     </div>
+                    <div class="swipe-hint" aria-hidden="true">Swipe left or right</div>
                     <div class="footer">
                         <a href="https://github.com/rafael-miano/bisu-corescore" target="_blank" rel="noopener" class="github-link">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
