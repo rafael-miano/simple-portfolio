@@ -158,7 +158,7 @@
           const normalizedMouseY = (isTouch || isSmall) ? 0 : mouseY;
           for (const layer of layers) {
             const depth = parseFloat(layer.getAttribute('data-depth') || '0');
-            const depthScale = isSmall ? 0.45 : 1; // shallower on small screens
+            const depthScale = (isSmall || isTouch) ? 0 : 1; // disable parallax on small/touch to avoid jitter
             const effectiveDepth = depth * depthScale;
             const tx = normalizedMouseX * effectiveDepth * 20;
             const ty = normalizedMouseY * effectiveDepth * 20;
