@@ -77,8 +77,8 @@
         radial-gradient(1200px 700px at 80% -10%, rgba(99,102,241,0.10), transparent 60%),
         radial-gradient(900px 600px at -10% 110%, rgba(14,165,233,0.10), transparent 60%);
     }
-    .rmpx-layer { position: absolute; inset: 0; will-change: transform; }
-    .rmpx-shape { filter: blur(0.3px); opacity: 0.8; }
+    .rmpx-layer { position: absolute; inset: 0; will-change: transform; backface-visibility: hidden; transform: translateZ(0); contain: paint; }
+    .rmpx-shape { filter: blur(0.3px); opacity: 0.8; overflow: visible; }
     .rmpx-grad-1 { fill: url(#rmpx-g1); opacity: 0.6; }
     .rmpx-grad-2 { fill: url(#rmpx-g2); opacity: 0.55; }
     .rmpx-stroke { stroke: rgba(255,255,255,0.12); fill: none; }
@@ -107,8 +107,6 @@
 
     <div class="rmpx-layer" data-depth="0.05">
       <svg class="rmpx-shape" width="1600" height="1100" viewBox="0 0 1600 1100" style="position:absolute;left:-12%;top:-12%">
-        <circle class="rmpx-grad-1" cx="1240" cy="140" r="240" />
-        <ellipse class="rmpx-grad-2" cx="240" cy="940" rx="360" ry="230" />
       </svg>
     </div>
     <div class="rmpx-layer" data-depth="0.12">
@@ -141,35 +139,59 @@
       const root = document.querySelector('.rmpx-parallax');
       if (!root) return;
       const layers = Array.from(root.querySelectorAll('.rmpx-layer'));
-      let mouseX = 0, mouseY = 0, winW = window.innerWidth, winH = window.innerHeight;
+      let winW = window.innerWidth, winH = window.innerHeight;
 
-      const onScroll = () => {
-        const scrollY = window.scrollY || window.pageYOffset;
-        for (const layer of layers) {
-          const depth = parseFloat(layer.getAttribute('data-depth') || '0');
-          layer.style.transform = `translate3d(0, ${-scrollY * depth}px, 0)`;
+      // State updated by events; consumed in rAF
+      let mouseX = 0, mouseY = 0;
+      let scrollY = window.scrollY || window.pageYOffset;
+      let needsUpdate = true; // initial paint
+
+      // Mobile tuning: reduce depth to avoid clipping and disable mouse parallax on touch
+      const mq = window.matchMedia('(max-width: 600px)');
+      let isSmall = mq.matches;
+      let isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      mq.addEventListener && mq.addEventListener('change', (e) => { isSmall = e.matches; needsUpdate = true; });
+
+      function update() {
+        if (needsUpdate) {
+          const normalizedMouseX = (isTouch || isSmall) ? 0 : mouseX;
+          const normalizedMouseY = (isTouch || isSmall) ? 0 : mouseY;
+          for (const layer of layers) {
+            const depth = parseFloat(layer.getAttribute('data-depth') || '0');
+            const depthScale = isSmall ? 0.45 : 1; // shallower on small screens
+            const effectiveDepth = depth * depthScale;
+            const tx = normalizedMouseX * effectiveDepth * 20;
+            const ty = normalizedMouseY * effectiveDepth * 20;
+            layer.style.transform = `translate3d(${tx}px, ${-scrollY * effectiveDepth + ty}px, 0)`;
+          }
+          needsUpdate = false;
         }
-      };
+        requestAnimationFrame(update);
+      }
 
-      const onMouse = (e) => {
+      function onScroll() {
+        scrollY = window.scrollY || window.pageYOffset;
+        needsUpdate = true;
+      }
+
+      function onMouse(e) {
         mouseX = (e.clientX / winW - 0.5);
         mouseY = (e.clientY / winH - 0.5);
-        for (const layer of layers) {
-          const depth = parseFloat(layer.getAttribute('data-depth') || '0');
-          const tx = mouseX * depth * 20;
-          const ty = mouseY * depth * 20;
-          const scrollY = window.scrollY || window.pageYOffset;
-          layer.style.transform = `translate3d(${tx}px, ${-scrollY * depth + ty}px, 0)`;
-        }
-      };
+        needsUpdate = true;
+      }
 
-      let rafId = 0;
-      const onResize = () => { winW = window.innerWidth; winH = window.innerHeight; cancelAnimationFrame(rafId); rafId = requestAnimationFrame(onScroll); };
+      function onResize() {
+        winW = window.innerWidth;
+        winH = window.innerHeight;
+        needsUpdate = true;
+      }
 
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('mousemove', onMouse, { passive: true });
       window.addEventListener('resize', onResize);
-      onScroll();
+
+      // Kick off the rAF loop
+      requestAnimationFrame(update);
     })();
   </script>
   <!-- ========== HEADER ========== -->
