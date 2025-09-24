@@ -474,12 +474,29 @@
                         "assets/project-ss/corescore/15.png",
                         "assets/project-ss/corescore/16.png"
                     ];
+                    // Preload the first few images for the fastest first paint
+                    const head = document.head || document.getElementsByTagName('head')[0];
+                    corescoreImages.slice(0, 3).forEach((href) => {
+                        const link = document.createElement('link');
+                        link.rel = 'preload';
+                        link.as = 'image';
+                        link.href = href;
+                        head.appendChild(link);
+                    });
                     
                     corescoreImages.forEach((imgSrc, index) => {
                         const img = document.createElement("img");
                         img.src = imgSrc;
                         img.alt = `CoreScore Screenshot ${index + 1}`;
-                        img.loading = "lazy";
+                        if (index === 0) {
+                            img.loading = "eager";
+                            img.decoding = "async";
+                            img.setAttribute('fetchpriority', 'high');
+                        } else {
+                            img.loading = "lazy";
+                            img.decoding = "async";
+                            img.sizes = "(max-width: 900px) 100vw, 60vw";
+                        }
                         img.onerror = function() {
                             console.error(`Failed to load image: ${imgSrc}`);
                         };
@@ -494,14 +511,12 @@
                         if (index === 0) dot.classList.add("active");
                         dotsEl.appendChild(dot);
                     });
-                    
-                    corescoreImages.forEach((imgSrc, index) => {
-                        const img = document.createElement("img");
-                        img.src = imgSrc;
-                        img.alt = `CoreScore Screenshot ${index + 1} (duplicate)`;
-                        img.loading = "lazy";
-                        sliderEl.appendChild(img);
-                    });
+                    // Append a single clone of the first slide to enable seamless looping
+                    const firstSlideClone = sliderEl.firstElementChild?.cloneNode(true);
+                    if (firstSlideClone) {
+                        firstSlideClone.setAttribute('aria-hidden', 'true');
+                        sliderEl.appendChild(firstSlideClone);
+                    }
                     setTimeout(() => {
                         initSlider();
                     }, 100);
